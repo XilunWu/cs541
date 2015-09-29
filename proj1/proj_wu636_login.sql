@@ -31,26 +31,53 @@ on p.ProjId = ep.ProjId
 group by p.ProjId;
 
 /*
-	#4
+	#4  Using view, it will be easier
 */
-select p.ProjId as ProjId, count(distinct pm.ProjId) as num
-from Project p, ProjectManager pm
-where p.ProjId = pm.MgrId
-group by p.ProjId;
 
-select max(pm.num) as num
+select p.ProjName as ProjName, maxProj.num as num
 from (
-		select p.ProjId as ProjId, count(distinct pm.ProjId) as num
-		from Project p, ProjectManager pm
-		where p.ProjId = pm.MgrId
-		group by p.ProjId
-	) pm;
-/*	it returns the max num */
+		select pm.ProjId as ProjId, pm.num as num
+		from (
+				select p.ProjId as ProjId, count(distinct pm.MgrId) as num
+				from Project p, ProjectManager pm
+				where p.ProjId = pm.ProjId
+				group by p.ProjId
+			) pm
+		where pm.num = (select (max(maxnum.num)) from (
+							select p.ProjId as ProjId, count(distinct pm.MgrId) as num
+							from Project p, ProjectManager pm
+							where p.ProjId = pm.ProjId
+							group by p.ProjId
+						) maxnum)
+) maxProj, Project p
+where maxProj.ProjId = p.ProjId
+
 
 /*
 	#5
 similarly
 */
+
+select table1.UnivId as UnivId from (
+	select table1.UnivId as UnivId, count(distinct table1.EmpId) as num
+	from (
+		select u.UnivId as UnivId, g.EmpId as EmpId, u.UnivName as UnivName
+		from University u, Graduate g, ProjectManager pm
+		where u.UnivId = g.UnivId and g.EmpId = pm.MgrId
+	) table1
+	group by table1.UnivId
+) table1
+where table1.num = (select max(table2.num) 
+					from (
+						select table1.UnivId as UnivId, count(distinct table1.EmpId) as num
+						from (
+							select u.UnivId as UnivId, g.EmpId as EmpId, u.UnivName as UnivName
+							from University u, Graduate g, ProjectManager pm
+							where u.UnivId = g.UnivId and g.EmpId = pm.MgrId
+						) table1
+						group by table1.UnivId
+						) table2
+					);
 
 /*	
 	#6
