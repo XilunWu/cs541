@@ -33,8 +33,7 @@ group by p.ProjId;
 /*
 	#4  Using view, it will be easier
 */
-
-select p.ProjName as ProjName, maxProj.num as num
+select p.ProjName as ProjName
 from (
 		select pm.ProjId as ProjId, pm.num as num
 		from (
@@ -50,32 +49,30 @@ from (
 							group by p.ProjId
 						) maxnum)
 ) maxProj, Project p
-where maxProj.ProjId = p.ProjId
-
+where maxProj.ProjId = p.ProjId;
 
 /*
 	#5
 similarly
 */
-
-select table1.UnivId as UnivId from (
-	select table1.UnivId as UnivId, count(distinct table1.EmpId) as num
+select table1.UnivName as UnivName from (
+	select table1.UnivId as UnivId, table1.UnivName as UnivName, count(distinct table1.EmpId) as num
 	from (
 		select u.UnivId as UnivId, g.EmpId as EmpId, u.UnivName as UnivName
 		from University u, Graduate g, ProjectManager pm
 		where u.UnivId = g.UnivId and g.EmpId = pm.MgrId
 	) table1
-	group by table1.UnivId
-) table1
-where table1.num = (select max(table2.num) 
-					from (
-						select table1.UnivId as UnivId, count(distinct table1.EmpId) as num
+	group by table1.UnivId, table1.UnivName
+	) table1
+	where table1.num = (select max(table2.num) 
 						from (
-							select u.UnivId as UnivId, g.EmpId as EmpId, u.UnivName as UnivName
-							from University u, Graduate g, ProjectManager pm
-							where u.UnivId = g.UnivId and g.EmpId = pm.MgrId
-						) table1
-						group by table1.UnivId
+							select table1.UnivId as UnivId, count(distinct table1.EmpId) as num
+							from (
+								select u.UnivId as UnivId, g.EmpId as EmpId, u.UnivName as UnivName
+								from University u, Graduate g, ProjectManager pm
+								where u.UnivId = g.UnivId and g.EmpId = pm.MgrId
+							) table1
+							group by table1.UnivId
 						) table2
 					);
 
@@ -87,20 +84,28 @@ select EmpId, count(distinct ProjId) as num, avg(case when EndDate is null then 
 /*	
 	#7
 */
-select pm.ProjId, max(pm.time)
-from (
-select pm.ProjId, pm.MgrId, sum(case when EndDate is null then CURRENT_DATE else EndDate end - StartDate + 1) as time 
-from Project p, ProjectManager pm 
-where p.ProjId = pm.ProjId
-group by pm.ProjId, pm.MgrId
-) pm
-group by pm.ProjId;
-/* not complete yet */
+select table1.ProjName as ProjName, table2.MgrId as MgrId
+from 	Project table1,
+		(	select pm.ProjId as ProjId, pm.MgrId as MgrId, sum(case when EndDate is null then CURRENT_DATE else EndDate end - StartDate + 1) as time 
+		 	from Project p, ProjectManager pm 
+			where p.ProjId = pm.ProjId
+			group by pm.ProjId, pm.MgrId
+		) table2,
+		(	select pm.ProjId as ProjId, max(pm.time) as time
+			from (
+				select pm.ProjId as ProjId, pm.MgrId as MgrId, sum(case when EndDate is null then CURRENT_DATE else EndDate end - StartDate + 1) as time 
+				from Project p, ProjectManager pm 
+				where p.ProjId = pm.ProjId
+				group by pm.ProjId, pm.MgrId
+			) pm
+			group by pm.ProjId
+		) table3
+where table2.ProjId = table3.ProjId and table2.time = table3.time and table2.ProjId = table1.ProjId;
+
 
 /*
 	#8
 */
-
-select ep.ProjId as pid, ep.EmpId as eid, ep.EndDate as date1, pm.StartDate as date2
-from ProjectManager pm, EmpProject ep
-where ep.ProjId = pm.ProjId and ep.EmpId = pm.mgrid and pm.EndDate is null and ep.EndDate is not null and ep.startdate < pm.StartDate;
+select e.EmpName as name
+from ProjectManager pm, EmpProject ep, Employee e
+where ep.ProjId = pm.ProjId and ep.EmpId = pm.mgrid and pm.EndDate is null and ep.EndDate is not null and ep.startdate < pm.StartDate and e.EmpId = ep.EmpId;
