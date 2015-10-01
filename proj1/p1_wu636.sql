@@ -1,3 +1,4 @@
+@db.sql
 /*
 	#1
 */
@@ -109,3 +110,5 @@ where table2.ProjId = table3.ProjId and table2.time = table3.time and table2.Pro
 select e.EmpName as name
 from ProjectManager pm, EmpProject ep, Employee e
 where ep.ProjId = pm.ProjId and ep.EmpId = pm.mgrid and pm.EndDate is null and ep.EndDate is not null and ep.startdate < pm.StartDate and e.EmpId = ep.EmpId;
+
+@droptables.sql
