@@ -193,9 +193,9 @@ public class DiskMgr implements GlobalConst {
    * Allocates a set of pages on disk, given the run size.
    * 
    * @return The new page's id
- * @throws IOException 
- * @throws ChainException 
- * @throws IllegalArgumentException if run_size is invalid
+   * @throws IOException 
+   * @throws ChainException 
+   * @throws IllegalArgumentException if run_size is invalid
    * @throws IllegalStateException if the database is full
    */
   public PageId allocate_page(int run_size) throws ChainException, IOException {

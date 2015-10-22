@@ -15,4 +15,4 @@ compile:src/*/*.java
 
 xx : compile
 	$(JAVA) -cp $(CLASSPATH):bin tests.BMTest
-
+	
