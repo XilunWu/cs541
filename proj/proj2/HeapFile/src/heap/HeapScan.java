@@ -123,10 +123,9 @@ public class HeapScan
 		rid.slotno = ridptr.slotno;
 		rid.pageno = ridptr.pageno;
 // System.out.println("0 -- getNext:rid.pageno.pid:"+rid.pageno.pid);
-		short length = curr_hf.getSlotLength(ridptr.slotno);
+		int length = curr_hf.getSlotLength(ridptr.slotno);
 // System.out.println((i++)+"	getNext:curr_pid:"+curr_pid+"	getNext:length:"+length+"	slotno:"+ridptr.slotno);
-		tuple = new Tuple();
-		tuple.copyData(curr_hf.selectRecord(ridptr), (short)0, length);
+		tuple = new Tuple(curr_hf.selectRecord(ridptr), 0, length);
 		ridptr = curr_hf.nextRecord(ridptr);
 		if(ridptr == null){
 

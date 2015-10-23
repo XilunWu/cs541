@@ -1,45 +1,42 @@
 package heap;
 
+import global.Convert;
 import global.GlobalConst;
+import global.Minibase;
+import global.RID;
+import heap.HeapFile;
+import heap.HeapScan;
+import heap.Tuple;
 
-import java.lang.*;
+import java.io.IOException;
 
-/*
- * Check if this definition is correct
- */
+import chainexception.ChainException;
+
 
 public class Tuple {
+
+	public static int max_size = 1024;
 	public byte data[];
 	private int offset;
 	private int length;
-
-	public Tuple() {
-		data = new byte[GlobalConst.PAGE_SIZE];
+	
+	public Tuple(){
+		data = new byte[max_size];
 		offset = 0;
-		length = GlobalConst.PAGE_SIZE;
+		length = max_size;
 	}
 	
-	public void copyData(byte [] t_data, short start, short length)
-	{
-		for (int i = 0; i < length; i++)
-		{
-			data[i] = t_data[i + start];
-		}
-	}
-
 	public Tuple(byte t_data[], int t_offset, int t_length){
 		data = t_data;
 		offset = t_offset;
 		length = t_length;
 	}
-
-	public int getLength()
-	{
+	
+	public int getLength(){
 		return length;
 	}
 	
-	public byte [] getTupleByteArray()
-	{
+	public byte[] getTupleByteArray(){
 		return data;
 	}
 }
